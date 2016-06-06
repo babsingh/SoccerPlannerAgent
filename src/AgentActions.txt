@@ -1,0 +1,1 @@
+action: (kick) preconditions: (!ball_in_possession v is_being_blocked) additions: (is_goal_scored) deletions: () 
