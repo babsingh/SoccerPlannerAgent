@@ -50,38 +50,27 @@ public class Environment {
 
 	public boolean getSensoryInfo(Integer property) {
 		Boolean result = null;
-
-		if (sensoryInformation.containsKey(property)) {
-			result = sensoryInformation.get(property);
+		Integer id = null;
+		Integer negatedProperty = null;
+		
+		if (executor.sensoryMapping.containsValue(property)) {
+			id = property;
 		} else {
-			Integer negatedProperty = new Integer(-1 * property.intValue());
-			if (sensoryInformation.containsKey(negatedProperty)) {
-				result = sensoryInformation.get(negatedProperty);
-				if (null != result) {
-					result = !result;
-				}
+			negatedProperty = new Integer(-1 * property.intValue());
+			if (executor.sensoryMapping.containsValue(negatedProperty)) {
+				id = negatedProperty;
 			}
-
-			if (null == result) {
-				Integer id = null;
-				if (executor.sensoryMapping.containsValue(property)) {
-					id = property;
-				}
-				if (executor.sensoryMapping.containsValue(negatedProperty)) {
-					id = negatedProperty;
-				}
-				if (null == id) {
-					System.out.println("ERROR: Unkown mapping provided");
-					System.exit(1);
-				}
-				boolean intermediateResult = executor.run(id, memory);
-				sensoryInformation.put(id, result);
-				if (id.compareTo(negatedProperty) == 0) {
-					intermediateResult = !intermediateResult;
-				}
-				result = intermediateResult;
+			if (null == id) {
+				System.out.println("ERROR: Unkown mapping provided");
+				System.exit(1);
 			}
 		}
+		boolean intermediateResult = executor.run(id, memory);
+		sensoryInformation.put(id, result);
+		if ((null != negatedProperty) && (id.compareTo(negatedProperty) == 0)) {
+			intermediateResult = !intermediateResult;
+		}
+		result = intermediateResult;
 
 		boolean out = false;
 		if (null != result) {
