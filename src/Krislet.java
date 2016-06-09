@@ -80,7 +80,7 @@ class Krislet implements SendCommand {
 		Krislet player = new Krislet(InetAddress.getByName(hostName), port,
 				team);
 
-		System.exit(1);
+//		System.exit(1);
 		
 		// enter main loop
 		player.mainLoop();
@@ -95,8 +95,8 @@ class Krislet implements SendCommand {
 		m_port = port;
 		m_team = team;
 		m_playing = true;
-		executor = new Executor();
-		parseAgentActions();
+//		executor = new Executor();
+//		parseAgentActions();
 	}
 
 	private void parseAgentActions() {

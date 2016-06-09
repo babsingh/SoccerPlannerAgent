@@ -99,6 +99,9 @@ class Brain extends Thread implements SensorInput {
 
 		while (!m_timeOver) {
 			object = m_memory.getObject("ball");
+			if (object != null) {
+			if(object.m_distance <= 1.0){ Debug.print("Ball In Possession... ");}
+			}
 			if (object == null) {
 				// If you don't know where is ball then find it
 				m_krislet.turn(40);
@@ -168,5 +171,5 @@ class Brain extends Thread implements SensorInput {
 	private char m_side;
 	volatile private boolean m_timeOver;
 	private String m_playMode;
-	private static boolean useModifiedKrislet = true;
+	private static boolean useModifiedKrislet = false;
 }
