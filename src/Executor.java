@@ -47,9 +47,6 @@ public class Executor extends Converter {
 		} else if (idValue == CODE_IS_BEING_BLOCKED) {
 			result = is_being_blocked(sendCommand, memory.m_info, memory);
 			Debug.print("Executing Property: " + IS_BEING_BLOCKED + " Output: " + result);
-		} else if (idValue == CODE_CAN_PASS) {
-			result = can_pass(sendCommand, memory.m_info, memory);
-			Debug.print("Executing Property: " + CAN_PASS + " Output: " + result);
 		} else if (idValue == CODE_IS_BALL_INSIDE_GOAL) {
 			result = is_goal_scored(sendCommand, memory.m_info, memory);
 			Debug.print("Executing Property: " + IS_BALL_INSIDE_GOAL + " Output: " + result);
@@ -193,14 +190,6 @@ public class Executor extends Converter {
 	}
 
 	private boolean is_being_blocked(SendCommand sendCommand, VisualInfo info,
-			Memory memory) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	// ASSUMES our player has the Ball
-	// ASSUMES all condition of ball
-	private boolean can_pass(SendCommand sendCommand, VisualInfo info,
 			Memory memory) {
 		// TODO Auto-generated method stub
 		return false;
