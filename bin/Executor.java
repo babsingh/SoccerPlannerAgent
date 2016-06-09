@@ -1,3 +1,7 @@
+/*
+ * The purpose of this class is to evaluate environment properties 
+ * and execute agent actions. 
+ */
 public class Executor extends Converter {
 	public SendCommand sendCommand;
 	public char side = 'l';
@@ -10,6 +14,10 @@ public class Executor extends Converter {
 		this.side = side;
 	}
 
+	/* 
+	 * Based upon the id passed to this method, the corresponding agent action or 
+	 * environment property is executed or evaluated respectively.
+	 */
 	public boolean run(Integer id, Memory memory) {
 
 		boolean result = false;
@@ -18,9 +26,6 @@ public class Executor extends Converter {
 		if (idValue == CODE_PASS_ACTION) {
 			result = pass(sendCommand, memory.m_info, memory);
 			Debug.print("Executing Action: " + PASS_ACTION + " Output: " + result);
-		} else if (idValue == CODE_KICK_ACTION) {
-			result = kick(sendCommand, memory.m_info, memory);
-			Debug.print("Executing Action: " + KICK_ACTION + " Output: " + result);
 		} else if (idValue == CODE_LOCATE_BALL_ACTION) {
 			result = locate_ball(sendCommand, memory.m_info, memory);
 			Debug.print("Executing Action: " + LOCATE_BALL_ACTION + " Output: " + result);
@@ -80,12 +85,6 @@ public class Executor extends Converter {
 		  }
 	    }
 	    }
-		return false;
-	}
-
-	//Assumes Player is with the ball
-	private boolean kick(SendCommand sendCommand, VisualInfo info, Memory memory) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -187,7 +186,8 @@ public class Executor extends Converter {
 		// TODO Auto-generated method stub
 		ObjectInfo ball = memory.getObject("ball");
 		if (ball!=null){
-		if (ball.m_direction != 0) return true;
+		//if (ball.m_direction != 0) 
+			return true;
 		}
 		return false;
 	}
