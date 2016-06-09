@@ -3,19 +3,19 @@ import java.util.Iterator;
 
 
 public class Converter {
-	private final String PASS_ACTION = "pass"; 
-	private final String KICK_ACTION = "kick";
-	private final String LOCATE_BALL_ACTION = "locate_ball"; 
-	private final String INTERCEPT_BALL_ACTION = "intercept_ball";
-	private final String LOCATE_GOAL_ACTION = "locate_goal"; 
-	private final String SCORE_GOAL_ACTION = "score_goal";
+	public final String PASS_ACTION = "pass"; 
+	public final String KICK_ACTION = "kick";
+	public final String LOCATE_BALL_ACTION = "locate_ball"; 
+	public final String INTERCEPT_BALL_ACTION = "intercept_ball";
+	public final String LOCATE_GOAL_ACTION = "locate_goal"; 
+	public final String SCORE_GOAL_ACTION = "score_goal";
 	
-	private final String BALL_IN_POSSESSION = "ball_in_possession";
-	private final String IS_BALL_VISIBLE = "is_ball_visible";
-	private final String IS_BEING_BLOCKED = "is_being_blocked";
-	private final String CAN_PASS = "can_pass";
-	private final String IS_BALL_INSIDE_GOAL = "ball_inside_goal";
-	private final String IS_GOAL_VISIBLE = "is_goal_visible";
+	public final String BALL_IN_POSSESSION = "ball_in_possession";
+	public final String IS_BALL_VISIBLE = "is_ball_visible";
+	public final String IS_BEING_BLOCKED = "is_being_blocked";
+	public final String CAN_PASS = "can_pass";
+	public final String IS_BALL_INSIDE_GOAL = "ball_inside_goal";
+	public final String IS_GOAL_VISIBLE = "is_goal_visible";
 	
 //	public final int CODE_PASS_ACTION = PASS_ACTION.hashCode(); 
 //	public final int CODE_KICK_ACTION = KICK_ACTION.hashCode();
@@ -63,7 +63,7 @@ public class Converter {
 		checkForSimilarMappings();
 	}
 	
-	private void generateMapping() {
+	public void generateMapping() {
 		this.actionMapping.put(PASS_ACTION, CODE_PASS_ACTION);
 		this.actionMapping.put(KICK_ACTION, CODE_KICK_ACTION);
 		this.actionMapping.put(LOCATE_BALL_ACTION, CODE_LOCATE_BALL_ACTION);
@@ -79,7 +79,7 @@ public class Converter {
 		this.sensoryMapping.put(IS_GOAL_VISIBLE, CODE_IS_GOAL_VISIBLE);
 	}
 	
-	private void checkForSimilarMappings() {
+	public void checkForSimilarMappings() {
 		Iterator<String> actionAterator = actionMapping.keySet().iterator();
 		Iterator<String> sensoryIterator = sensoryMapping.keySet().iterator();
 		Integer oldValue = null;
