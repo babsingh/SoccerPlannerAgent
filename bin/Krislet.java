@@ -221,9 +221,7 @@ class Krislet implements SendCommand {
 
 		executor = new Executor(this, m_team, m.group(1).charAt(0));
 		parseAgentActions();
-		
-		System.exit(1);
-		
+				
 		// initialize player's brain
 		m_brain = new Brain(this, m_team, m.group(1).charAt(0),
 				Integer.parseInt(m.group(2)), m.group(3), executor, agentActions);
