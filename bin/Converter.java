@@ -21,7 +21,6 @@ public class Converter {
 	public final String BALL_IN_POSSESSION = "ball_in_possession";
 	public final String IS_BALL_VISIBLE = "is_ball_visible";
 	public final String IS_BEING_BLOCKED = "is_being_blocked";
-	public final String CAN_PASS = "can_pass";
 	public final String IS_BALL_INSIDE_GOAL = "ball_inside_goal";
 	public final String IS_GOAL_VISIBLE = "is_goal_visible";
 	
@@ -35,7 +34,6 @@ public class Converter {
 //	public final int CODE_BALL_IN_POSSESSION = BALL_IN_POSSESSION.hashCode();
 //	public final int CODE_IS_BALL_VISIBLE = IS_BALL_VISIBLE.hashCode();
 //	public final int CODE_IS_BEING_BLOCKED = IS_BEING_BLOCKED.hashCode();
-//	public final int CODE_CAN_PASS = CAN_PASS.hashCode();
 //	public final int CODE_IS_BALL_INSIDE_GOAL = IS_BALL_INSIDE_GOAL.hashCode();
 //	public final int CODE_IS_GOAL_VISIBLE = IS_GOAL_VISIBLE.hashCode();
 	
@@ -50,9 +48,8 @@ public class Converter {
 	public final int CODE_BALL_IN_POSSESSION = 6;
 	public final int CODE_IS_BALL_VISIBLE = 7;
 	public final int CODE_IS_BEING_BLOCKED = 8;
-	public final int CODE_CAN_PASS = 9;
-	public final int CODE_IS_BALL_INSIDE_GOAL = 10;
-	public final int CODE_IS_GOAL_VISIBLE = 11;
+	public final int CODE_IS_BALL_INSIDE_GOAL = 9;
+	public final int CODE_IS_GOAL_VISIBLE = 10;
 	
 	/* Stores mapping between string format of agent actions with the corresponding int format */
 	public HashMap<String, Integer> actionMapping;
@@ -87,7 +84,6 @@ public class Converter {
 		this.sensoryMapping.put(BALL_IN_POSSESSION, CODE_BALL_IN_POSSESSION);
 		this.sensoryMapping.put(IS_BALL_VISIBLE, CODE_IS_BALL_VISIBLE);
 		this.sensoryMapping.put(IS_BEING_BLOCKED, CODE_IS_BEING_BLOCKED);
-		this.sensoryMapping.put(CAN_PASS, CODE_CAN_PASS);
 		this.sensoryMapping.put(IS_BALL_INSIDE_GOAL, CODE_IS_BALL_INSIDE_GOAL);
 		this.sensoryMapping.put(IS_GOAL_VISIBLE, CODE_IS_GOAL_VISIBLE);
 	}
