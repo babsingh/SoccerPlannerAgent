@@ -18,31 +18,31 @@ public class AgentAction {
 		return preconditions;
 	}
 	
-	public boolean checkAdditions (Integer action) {
-		boolean result = false;
+	public boolean checkAdditions(Integer property) {
+		boolean result = true;
 		
-		if ((null != additions) && additions.contains(action)) {
-			result = true;
+		if ((null != additions) && !additions.contains(property)) {
+			result = false;
 		}
 		
 		return result;
 	}
 
-	public boolean checkDeletions (Integer action) {
-		boolean result = false;
+	public boolean checkDeletions(Integer property) {
+		boolean result = true;
 		
-		if ((null != deletions) && deletions.contains(action)) {
-			result = true;
+		if ((null != deletions) && !deletions.contains(property)) {
+			result = false;
 		}
 		
 		return result;
 	}
 	
-	public boolean checkPreconditions (Integer action) {
-		boolean result = false;
+	public boolean checkPreconditions(Integer property) {
+		boolean result = true;
 		
-		if ((null != preconditions) && preconditions.contains(action)) {
-			result = true;
+		if ((null != preconditions) && !preconditions.contains(property)) {
+			result = false;
 		}
 		
 		return result;
@@ -61,9 +61,9 @@ public class AgentAction {
 			Debug.print(name + " - " + id);
 		}
 		
-		preconditions = parsePreConditions(preconditionString, executor);
-		additions = parseOtherConditions(additionString, executor);
-		deletions = parseOtherConditions(deletionString, executor);
+		preconditions = parseConditions(preconditionString, executor);
+		additions = parseConditions(additionString, executor);
+		deletions = parseConditions(deletionString, executor);
 		
 		if (Debug.enabledDebugging) {
 			printArrayList(preconditions, "pre");
@@ -84,7 +84,7 @@ public class AgentAction {
 		}
 	}
 
-	public static ArrayList<Integer> parsePreConditions(String string, Executor executor) {
+	public static ArrayList<Integer> parseConditions(String string, Executor executor) {
 		ArrayList<Integer> conditions = new ArrayList<Integer>();
 		String[] subStrings = string.split("\\s+");
 		for (String element : subStrings) {
@@ -100,33 +100,8 @@ public class AgentAction {
 					}
 				} else if (executor.sensoryMapping.containsKey(element)) {
 					conditions.add(executor.sensoryMapping.get(element));
-				} else if (element.charAt(0) == 'v') {
+				} else if (element.charAt(0) == '^') {
 					
-				} else {
-					System.out.println("ERROR: Unsupported syntax - " + element);
-					System.exit(0);
-				}
-			}
-		}
-		return conditions;
-	}
-	
-	public static ArrayList<Integer> parseOtherConditions(String string, Executor executor) {
-		ArrayList<Integer> conditions = new ArrayList<Integer>();
-		String[] subStrings = string.split("\\s+");
-		for (String element : subStrings) {
-			if (element.length() > 0) {
-				if (element.charAt(0) == '!') {
-					element = element.substring(1);
-					if (executor.sensoryMapping.containsKey(element)) {
-						Integer code = executor.sensoryMapping.get(element);
-						conditions.add(-1 * code.intValue());
-					} else {
-						System.out.println("ERROR: Unsupported syntax - " + element);
-						System.exit(0);
-					}
-				} else if (executor.sensoryMapping.containsKey(element)) {
-					conditions.add(executor.sensoryMapping.get(element));
 				} else if (element.charAt(0) == ',') {
 					
 				} else {

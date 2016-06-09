@@ -80,8 +80,6 @@ class Krislet implements SendCommand {
 		Krislet player = new Krislet(InetAddress.getByName(hostName), port,
 				team);
 
-		System.exit(1);
-		
 		// enter main loop
 		player.mainLoop();
 	}
@@ -95,8 +93,6 @@ class Krislet implements SendCommand {
 		m_port = port;
 		m_team = team;
 		m_playing = true;
-		executor = new Executor();
-		parseAgentActions();
 	}
 
 	private void parseAgentActions() {
@@ -108,12 +104,12 @@ class Krislet implements SendCommand {
 			FileReader fileReader = new FileReader(fileName);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
 
-			Pattern pattern = Pattern.compile("action:\\s\\((.*?)\\)\\spreconditions:\\s\\((.*?)\\)\\sadditions:\\s\\((.*?)\\)\\sdeletions:\\s\\((.*?)\\)");
+			Pattern pattern = Pattern.compile("^action:\\s\\((.*?)\\)\\spreconditions:\\s\\((.*?)\\)\\sadditions:\\s\\((.*?)\\)\\sdeletions:\\s\\((.*?)\\)$");
 			while ((line = bufferedReader.readLine()) != null) {
 				if (((line = line.trim()) != null) && !line.isEmpty()) {
 					Matcher matcher = pattern.matcher(line);
 					AgentAction action = null;
-					if (matcher.find()) {
+					while (matcher.find()) {
 						action = AgentAction.newInstance(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4), executor);
 					} 
 					if (null == action) {
@@ -223,9 +219,14 @@ class Krislet implements SendCommand {
 			throw new IOException(message);
 		}
 
+		executor = new Executor(this, m_team, m.group(1).charAt(0));
+		parseAgentActions();
+		
+		System.exit(1);
+		
 		// initialize player's brain
 		m_brain = new Brain(this, m_team, m.group(1).charAt(0),
-				Integer.parseInt(m.group(2)), m.group(3));
+				Integer.parseInt(m.group(2)), m.group(3), executor, agentActions);
 	}
 
 	// ===========================================================================
@@ -314,12 +315,11 @@ class Krislet implements SendCommand {
 	private SensorInput m_brain; // input for sensor information
 	private boolean m_playing; // controls the MainLoop
 	private Pattern message_pattern = Pattern.compile("^\\((\\w+?)\\s.*");
-	private Pattern hear_pattern = Pattern
-			.compile("^\\(hear\\s(\\w+?)\\s(\\w+?)\\s(.*)\\).*");
+	private Pattern hear_pattern = Pattern.compile("^\\(hear\\s(\\w+?)\\s(\\w+?)\\s(.*)\\).*");
 	// private Pattern coach_pattern = Pattern.compile("coach");
 	// constants
 	private static final int MSG_SIZE = 4096; // Size of socket buffer
-	private Executor executor;
-	private ArrayList<AgentAction> agentActions;
+	public Executor executor;
+	public ArrayList<AgentAction> agentActions;
 
 }

@@ -3,44 +3,46 @@ import java.util.Iterator;
 
 
 public class Converter {
-	private final static String PASS_ACTION = "pass"; 
-	private final static String KICK_ACTION = "kick";
-	private final static String LOCATE_BALL_ACTION = "locate_ball"; 
-	private final static String INTERCEPT_BALL_ACTION = "intercept_ball";
-	private final static String LOCATE_GOAL_ACTION = "locate_goal"; 
-	private final static String SCORE_GOAL_ACTION = "score_goal";
+	private final String PASS_ACTION = "pass"; 
+	private final String KICK_ACTION = "kick";
+	private final String LOCATE_BALL_ACTION = "locate_ball"; 
+	private final String INTERCEPT_BALL_ACTION = "intercept_ball";
+	private final String LOCATE_GOAL_ACTION = "locate_goal"; 
+	private final String SCORE_GOAL_ACTION = "score_goal";
 	
-	private final static String BALL_IN_POSSESSION = "ball_in_possession";
-	private final static String IS_BALL_VISIBLE = "is_ball_visible";
-	private final static String IS_BEING_BLOCKED = "is_being_blocked";
-	private final static String CAN_PASS = "can_pass";
-	private final static String IS_GOAL_SCORED = "is_goal_scored";
+	private final String BALL_IN_POSSESSION = "ball_in_possession";
+	private final String IS_BALL_VISIBLE = "is_ball_visible";
+	private final String IS_BEING_BLOCKED = "is_being_blocked";
+	private final String CAN_PASS = "can_pass";
+	private final String IS_BALL_INSIDE_GOAL = "ball_inside_goal";
+	private final String IS_GOAL_VISIBLE = "is_goal_visible";
 	
-//	public final static int CODE_PASS_ACTION = PASS_ACTION.hashCode(); 
-//	public final static int CODE_KICK_ACTION = KICK_ACTION.hashCode();
-//	public final static int CODE_LOCATE_BALL_ACTION = LOCATE_BALL_ACTION.hashCode(); 
-//	public final static int CODE_INTERCEPT_BALL_ACTION = INTERCEPT_BALL_ACTION.hashCode();
-//	public final static int CODE_LOCATE_GOAL_ACTION = LOCATE_GOAL_ACTION.hashCode(); 
-//	public final static int CODE_SCORE_GOAL_ACTION = SCORE_GOAL_ACTION.hashCode();
+//	public final int CODE_PASS_ACTION = PASS_ACTION.hashCode(); 
+//	public final int CODE_KICK_ACTION = KICK_ACTION.hashCode();
+//	public final int CODE_LOCATE_BALL_ACTION = LOCATE_BALL_ACTION.hashCode(); 
+//	public final int CODE_INTERCEPT_BALL_ACTION = INTERCEPT_BALL_ACTION.hashCode();
+//	public final int CODE_LOCATE_GOAL_ACTION = LOCATE_GOAL_ACTION.hashCode(); 
+//	public final int CODE_SCORE_GOAL_ACTION = SCORE_GOAL_ACTION.hashCode();
 //	
-//	public final static int CODE_BALL_IN_POSSESSION = BALL_IN_POSSESSION.hashCode();
-//	public final static int CODE_IS_BALL_VISIBLE = IS_BALL_VISIBLE.hashCode();
-//	public final static int CODE_IS_BEING_BLOCKED = IS_BEING_BLOCKED.hashCode();
-//	public final static int CODE_CAN_PASS = CAN_PASS.hashCode();
-//	public final static int CODE_IS_GOAL_SCORED = IS_GOAL_SCORED.hashCode();
+//	public final int CODE_BALL_IN_POSSESSION = BALL_IN_POSSESSION.hashCode();
+//	public final int CODE_IS_BALL_VISIBLE = IS_BALL_VISIBLE.hashCode();
+//	public final int CODE_IS_BEING_BLOCKED = IS_BEING_BLOCKED.hashCode();
+//	public final int CODE_CAN_PASS = CAN_PASS.hashCode();
+//	public final int CODE_IS_GOAL_SCORED = IS_GOAL_SCORED.hashCode();
 	
-	public final static int CODE_PASS_ACTION = 1; 
-	public final static int CODE_KICK_ACTION = 2;
-	public final static int CODE_LOCATE_BALL_ACTION = 3; 
-	public final static int CODE_INTERCEPT_BALL_ACTION = 4;
-	public final static int CODE_LOCATE_GOAL_ACTION = 8; 
-	public final static int CODE_SCORE_GOAL_ACTION = 9;
+	public final int CODE_PASS_ACTION = 1; 
+	public final int CODE_KICK_ACTION = 2;
+	public final int CODE_LOCATE_BALL_ACTION = 3; 
+	public final int CODE_INTERCEPT_BALL_ACTION = 4;
+	public final int CODE_LOCATE_GOAL_ACTION = 8; 
+	public final int CODE_SCORE_GOAL_ACTION = 9;
 	
-	public final static int CODE_BALL_IN_POSSESSION = 10;
-	public final static int CODE_IS_BALL_VISIBLE = 11;
-	public final static int CODE_IS_BEING_BLOCKED = 12;
-	public final static int CODE_CAN_PASS = 13;
-	public final static int CODE_IS_GOAL_SCORED = 14;
+	public final int CODE_BALL_IN_POSSESSION = 10;
+	public final int CODE_IS_BALL_VISIBLE = 11;
+	public final int CODE_IS_BEING_BLOCKED = 12;
+	public final int CODE_CAN_PASS = 13;
+	public final int CODE_IS_BALL_INSIDE_GOAL = 14;
+	public final int CODE_IS_GOAL_VISIBLE = 15;
 	
 	public HashMap<String, Integer> actionMapping;
 	public HashMap<String, Integer> sensoryMapping;
@@ -73,7 +75,8 @@ public class Converter {
 		this.sensoryMapping.put(IS_BALL_VISIBLE, CODE_IS_BALL_VISIBLE);
 		this.sensoryMapping.put(IS_BEING_BLOCKED, CODE_IS_BEING_BLOCKED);
 		this.sensoryMapping.put(CAN_PASS, CODE_CAN_PASS);
-		this.sensoryMapping.put(IS_GOAL_SCORED, CODE_IS_GOAL_SCORED);
+		this.sensoryMapping.put(IS_BALL_INSIDE_GOAL, CODE_IS_BALL_INSIDE_GOAL);
+		this.sensoryMapping.put(IS_GOAL_VISIBLE, CODE_IS_GOAL_VISIBLE);
 	}
 	
 	private void checkForSimilarMappings() {

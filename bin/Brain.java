@@ -9,6 +9,7 @@
 //    Date:             March 4, 2008
 
 import java.lang.Math;
+import java.util.ArrayList;
 import java.util.regex.*;
 
 class Brain extends Thread implements SensorInput {
@@ -17,14 +18,16 @@ class Brain extends Thread implements SensorInput {
 	// - stores connection to krislet
 	// - starts thread for this object
 	public Brain(SendCommand krislet, String team, char side, int number,
-			String playMode) {
-		m_timeOver = false;
-		m_krislet = krislet;
-		m_memory = new Memory();
+			String playMode, Executor executor, ArrayList<AgentAction> agentActions) {
+		this.m_timeOver = false;
+		this.sendCommand = krislet;
+		this.m_memory = new Memory();
 		// m_team = team;
-		m_side = side;
+		this.m_side = side;
 		// m_number = number;
-		m_playMode = playMode;
+		this.m_playMode = playMode;
+		this.executor = executor;
+		this.agentActions = agentActions;
 		start();
 	}
 
@@ -60,25 +63,65 @@ class Brain extends Thread implements SensorInput {
 		}
 	}
 
-	public void developPlan() {
-
+	public boolean developPlan(Environment env, ArrayList<Integer> properties, ArrayList<Integer> actionPlan) {
+		boolean result = true;
+		
+		for (Integer property : properties) {
+			boolean propertyValid = env.getSensoryInfo(property);
+			if (!propertyValid) {
+				boolean actionExists = false;
+				for (AgentAction agentAction : agentActions) {
+					if (agentAction.checkAdditions(property) 
+							&& developPlan(env, agentAction.getPreconditions(), actionPlan)) {
+						actionPlan.add(agentAction.getID());
+						ArrayList<Integer> temp = agentAction.getAdditions();
+						if (null != temp) {
+							for (Integer addProperty : temp) {
+								env.addSensoryInfo(addProperty);
+							}
+						}
+						temp = agentAction.getDeletions();
+						if (null != temp) {
+							for (Integer deleteProperty : temp) {
+								env.deleteSensoryInfo(deleteProperty);
+							}
+						}
+						actionExists = true;
+						break;
+					}
+				}
+				if (!actionExists) {
+					result = false;
+					break;
+				}
+			}
+		}
+		
+		return result;
 	}
 
-	public void executePlan() {
-
+	public void executePlan(ArrayList<Integer> actionPlan) {
+		for (Integer i : actionPlan) {
+			executor.run(i, m_memory);
+		}
 	}
 
 	public void modifiedKrislet() {
-		ObjectInfo object;
-
 		// first put it somewhere on my side
 		if (Pattern.matches("^before_kick_off.*", m_playMode))
-			m_krislet.move(-Math.random() * 52.5, 34 - Math.random() * 68.0);
+			sendCommand.move(-Math.random() * 52.5, 34 - Math.random() * 68.0);
 
 		while (!m_timeOver) {
 			/* TODO - Add code for planner */
-			developPlan();
-			executePlan();
+			Environment env = new Environment(executor, m_memory);
+			ArrayList<Integer> nextActions = new ArrayList<Integer>();
+			ArrayList<Integer> properties = new ArrayList<Integer>();
+			
+			properties.add(executor.CODE_IS_BALL_INSIDE_GOAL);
+			
+			if (developPlan(env, properties, nextActions)) {
+				executePlan(nextActions);
+			}
 
 			// sleep one step to ensure that we will not send
 			// two commands in one cycle.
@@ -87,7 +130,7 @@ class Brain extends Thread implements SensorInput {
 			} catch (Exception e) {
 			}
 		}
-		m_krislet.bye();
+		sendCommand.bye();
 	}
 
 	public void originalKrislet() {
@@ -95,22 +138,22 @@ class Brain extends Thread implements SensorInput {
 
 		// first put it somewhere on my side
 		if (Pattern.matches("^before_kick_off.*", m_playMode))
-			m_krislet.move(-Math.random() * 52.5, 34 - Math.random() * 68.0);
+			sendCommand.move(-Math.random() * 52.5, 34 - Math.random() * 68.0);
 
 		while (!m_timeOver) {
 			object = m_memory.getObject("ball");
 			if (object == null) {
 				// If you don't know where is ball then find it
-				m_krislet.turn(40);
+				sendCommand.turn(40);
 				m_memory.waitForNewInfo();
 			} else if (object.m_distance > 1.0) {
 				// If ball is too far then
 				// turn to ball or
 				// if we have correct direction then go to ball
 				if (object.m_direction != 0)
-					m_krislet.turn(object.m_direction);
+					sendCommand.turn(object.m_direction);
 				else
-					m_krislet.dash(10 * object.m_distance);
+					sendCommand.dash(10 * object.m_distance);
 			} else {
 				// We know where is ball and we can kick it
 				// so look for goal
@@ -120,10 +163,10 @@ class Brain extends Thread implements SensorInput {
 					object = m_memory.getObject("goal l");
 
 				if (object == null) {
-					m_krislet.turn(40);
+					sendCommand.turn(40);
 					m_memory.waitForNewInfo();
 				} else
-					m_krislet.kick(100, object.m_direction);
+					sendCommand.kick(100, object.m_direction);
 			}
 
 			// sleep one step to ensure that we will not send
@@ -133,7 +176,7 @@ class Brain extends Thread implements SensorInput {
 			} catch (Exception e) {
 			}
 		}
-		m_krislet.bye();
+		sendCommand.bye();
 	}
 
 	// ===========================================================================
@@ -163,10 +206,12 @@ class Brain extends Thread implements SensorInput {
 
 	// ===========================================================================
 	// Private members
-	private SendCommand m_krislet; // robot which is controled by this brain
+	private SendCommand sendCommand; // robot which is controled by this brain
 	private Memory m_memory; // place where all information is stored
 	private char m_side;
 	volatile private boolean m_timeOver;
 	private String m_playMode;
-	private static boolean useModifiedKrislet = true;
+	private static boolean useModifiedKrislet = false;
+	public Executor executor;
+	public ArrayList<AgentAction> agentActions;
 }
