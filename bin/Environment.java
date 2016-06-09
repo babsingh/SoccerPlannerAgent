@@ -11,20 +11,24 @@ public class Environment {
 		this.executor = executor;
 		this.memory = memory;
 		sensoryInformation = new HashMap<Integer, Boolean>();
+		for (Integer property : executor.sensoryMapping.values()) {
+			sensoryInformation.put(property, false);
+		}
 	}
 
 	public void addSensoryInfo(Integer property) {
 		if (executor.sensoryMapping.containsValue(property)) {
 			sensoryInformation.put(property, true);
 			Debug.print("Property: " + property + " - " + true);
-		}
-		Integer negatedProperty = new Integer(-1 * property.intValue());
-		if (executor.sensoryMapping.containsValue(negatedProperty)) {
-			sensoryInformation.put(negatedProperty, false);
-			Debug.print("Property: " + negatedProperty + " - " + false);
 		} else {
-			System.out.println("ERROR: Unkown mapping/property provided");
-			System.exit(1);
+			Integer negatedProperty = new Integer(-1 * property.intValue());
+			if (executor.sensoryMapping.containsValue(negatedProperty)) {
+				sensoryInformation.put(negatedProperty, false);
+				Debug.print("Property: " + negatedProperty + " - " + false);
+			} else {
+				System.out.println("ERROR: Unkown mapping/property provided - " + property);
+				System.exit(1);
+			}
 		}
 	}
 
@@ -32,14 +36,15 @@ public class Environment {
 		if (executor.sensoryMapping.containsValue(property)) {
 			sensoryInformation.put(property, false);
 			Debug.print("Property: " + property + " - " + false);
-		}
-		Integer negatedProperty = new Integer(-1 * property.intValue());
-		if (executor.sensoryMapping.containsValue(negatedProperty)) {
-			sensoryInformation.put(negatedProperty, true);
-			Debug.print("Property: " + negatedProperty + " - " + true);
 		} else {
-			System.out.println("ERROR: Unkown mapping/property provided");
-			System.exit(1);
+			Integer negatedProperty = new Integer(-1 * property.intValue());
+			if (executor.sensoryMapping.containsValue(negatedProperty)) {
+				sensoryInformation.put(negatedProperty, true);
+				Debug.print("Property: " + negatedProperty + " - " + true);
+			} else {
+				System.out.println("ERROR: Unkown mapping/property provided - " + property);
+				System.exit(1);
+			}
 		}
 	}
 
@@ -51,7 +56,10 @@ public class Environment {
 		} else {
 			Integer negatedProperty = new Integer(-1 * property.intValue());
 			if (sensoryInformation.containsKey(negatedProperty)) {
-				result = !sensoryInformation.get(negatedProperty);
+				result = sensoryInformation.get(negatedProperty);
+				if (null != result) {
+					result = !result;
+				}
 			}
 
 			if (null == result) {
@@ -75,8 +83,11 @@ public class Environment {
 			}
 		}
 
-		Debug.print("Property: " + property + " - " + result);
-
-		return result;
+		boolean out = false;
+		if (null != result) {
+			out = result.booleanValue();
+		}
+		Debug.print("Property: " + property + " - " + out);
+		return out;
 	}
 }
