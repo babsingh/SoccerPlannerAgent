@@ -67,6 +67,7 @@ class Brain extends Thread implements SensorInput {
 		boolean result = true;
 		
 		for (Integer property : properties) {
+			Debug.print("Property - " + property);
 			boolean propertyValid = env.getSensoryInfo(property);
 			if (!propertyValid) {
 				boolean actionExists = false;
@@ -87,11 +88,22 @@ class Brain extends Thread implements SensorInput {
 							}
 						}
 						actionExists = true;
+						numActions++;
+						Debug.print("Action found - " + agentAction.getID());
 						break;
 					}
 				}
+				if (numActions >= maxActions) {
+					numActions = 0;
+					Debug.print("Set of next actions choosen:");
+					for (Integer action : actionPlan) {
+						Debug.print("action - " + action);
+					}
+					break;
+				}
 				if (!actionExists) {
 					result = false;
+					Debug.print("No action found");
 					break;
 				}
 			}
@@ -211,7 +223,9 @@ class Brain extends Thread implements SensorInput {
 	private char m_side;
 	volatile private boolean m_timeOver;
 	private String m_playMode;
-	private static boolean useModifiedKrislet = false;
+	private static boolean useModifiedKrislet = true;
 	public Executor executor;
 	public ArrayList<AgentAction> agentActions;
+	public int numActions = 0;
+	public int maxActions = 5;
 }
