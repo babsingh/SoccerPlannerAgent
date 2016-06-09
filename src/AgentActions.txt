@@ -1,4 +1,3 @@
-action: (kick) preconditions: (ball_in_possession ^ is_being_blocked) additions: () deletions: (ball_in_possession) 
 action: (pass) preconditions: (ball_in_possession ^ is_being_blocked ^ can_pass) additions: () deletions: (is_being_blocked)
 action: (locate_ball) preconditions: (!is_ball_visible ^ !ball_in_possession) additions: (is_ball_visible) deletions: (!is_ball_visible)
 action: (intercept_ball) preconditions: (!ball_in_possession ^ is_ball_visible) additions: (ball_in_possession) deletions: (!ball_in_possession)

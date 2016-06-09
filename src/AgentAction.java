@@ -1,23 +1,43 @@
 import java.util.ArrayList;
 
+/*
+ * The purpose of this class is to parse an agent action from
+ * AgentActions.txt, and store the extracted information about the 
+ * agent action. The agent action has properties similar to STRIPS
+ * representation: id (name), preconditions, additions and deletions.  
+ */
 
 public class AgentAction {
+	/* Returns the unique id corresponding to the agent. */
 	public Integer getID() {
 		return id;
 	}
 	
+	/* 
+	 * Returns the properties which are to be added to the environment
+	 * after executing the action. 
+	 */
 	public ArrayList<Integer> getAdditions() {
 		return additions;
 	}
 	
+	/* 
+	 * Returns the properties which are to be deleted from the environment
+	 * after executing the action. 
+	 */
 	public ArrayList<Integer> getDeletions() {
 		return deletions;
 	}
 	
+	/*
+	 * Returns the properties which are supposed to be true before an action
+	 * can be executed.
+	 */
 	public ArrayList<Integer> getPreconditions() {
 		return preconditions;
 	}
 	
+	/* Checks if the given property exists in additions array. */
 	public boolean checkAdditions(Integer property) {
 		boolean result = true;
 		
@@ -28,6 +48,7 @@ public class AgentAction {
 		return result;
 	}
 
+	/* Checks if the given property exists in deletions array. */
 	public boolean checkDeletions(Integer property) {
 		boolean result = true;
 		
@@ -38,6 +59,7 @@ public class AgentAction {
 		return result;
 	}
 	
+	/* Checks if the given property exists in preconditions array. */
 	public boolean checkPreconditions(Integer property) {
 		boolean result = true;
 		
@@ -48,6 +70,7 @@ public class AgentAction {
 		return result;
 	}
 
+	/* Parses an agent action from AgentActions.txt and returns a new AgentAction object. */
 	public static AgentAction newInstance(String name, String preconditionString,
 			String additionString, String deletionString, Executor executor) {
 		AgentAction action = null;
@@ -76,14 +99,19 @@ public class AgentAction {
 		return action;
 	}
 	
-	private static void printArrayList(ArrayList<Integer> conditions, String type) {
-		if (null != conditions) {
-			for (Integer condition : conditions) {
+	/* Prints properties in the array - for debugging purposes */
+	private static void printArrayList(ArrayList<Integer> properties, String type) {
+		if (null != properties) {
+			for (Integer condition : properties) {
 				Debug.print(type + " condition: " + condition);
 			}
 		}
 	}
 
+	/*
+	 * Parses properties from the input String, which represents a condition or a list. 
+	 * Only following operators are allowed in the description: '!', ',' and '^' ('not', 'comma' and 'and').  
+	 */
 	public static ArrayList<Integer> parseConditions(String string, Executor executor) {
 		ArrayList<Integer> conditions = new ArrayList<Integer>();
 		String[] subStrings = string.split("\\s+");
