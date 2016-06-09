@@ -1,48 +1,51 @@
 public class Executor extends Converter {
-	
+	public SendCommand sendCommand;
 	public char side = 'l';
 	public String teamName="";
-	public Executor(char _side, String teamname) {		
+	
+	public Executor(SendCommand sendCommand, String teamName, char side) {
 		super();
-		side = _side;
-		teamName = teamname;
+		this.sendCommand = sendCommand;
+		this.teamName = teamName;
+		this.side = side;
 	}
 
-	public boolean run(Integer id, SendCommand sendCommand, VisualInfo info,
-			Memory memory) {
+	public boolean run(Integer id, Memory memory) {
 
 		boolean result = false;
 		int idValue = id.intValue();
 
 		if (idValue == CODE_PASS_ACTION) {
-			result = pass(sendCommand, info, memory);
+			result = pass(sendCommand, memory.m_info, memory);
 		} else if (idValue == CODE_KICK_ACTION) {
-			result = kick(sendCommand, info, memory);
+			result = kick(sendCommand, memory.m_info, memory);
 		} else if (idValue == CODE_LOCATE_BALL_ACTION) {
-			result = locate_ball(sendCommand, info, memory);
+			result = locate_ball(sendCommand, memory.m_info, memory);
 		} else if (idValue == CODE_INTERCEPT_BALL_ACTION) {
-			result = intercept_ball(sendCommand, info, memory);
+			result = intercept_ball(sendCommand, memory.m_info, memory);
 		} else if (idValue == CODE_LOCATE_GOAL_ACTION) {
-			result = locate_goal(sendCommand, info, memory);
+			result = locate_goal(sendCommand, memory.m_info, memory);
 		} else if (idValue == CODE_SCORE_GOAL_ACTION) {
-			result = score_goal(sendCommand, info, memory);
+			result = score_goal(sendCommand, memory.m_info, memory);
 		} else if (idValue == CODE_BALL_IN_POSSESSION) {
-			result = ball_in_possession(sendCommand, info, memory);
+			result = ball_in_possession(sendCommand, memory.m_info, memory);
 		} else if (idValue == CODE_IS_BALL_VISIBLE) {
-			result = is_ball_visible(sendCommand, info, memory);
+			result = is_ball_visible(sendCommand, memory.m_info, memory);
 		} else if (idValue == CODE_IS_BEING_BLOCKED) {
-			result = is_being_blocked(sendCommand, info, memory);
+			result = is_being_blocked(sendCommand, memory.m_info, memory);
 		} else if (idValue == CODE_CAN_PASS) {
-			result = can_pass(sendCommand, info, memory);
-		} else if (idValue == CODE_IS_GOAL_SCORED) {
-			result = is_goal_scored(sendCommand, info, memory);
+			result = can_pass(sendCommand, memory.m_info, memory);
+		} else if (idValue == CODE_IS_BALL_INSIDE_GOAL) {
+			result = is_goal_scored(sendCommand, memory.m_info, memory);
+		} else if (idValue == CODE_IS_GOAL_VISIBLE) {
+			result = is_goal_visible(sendCommand, memory.m_info, memory);
 		} else {
 			System.out.println("ERROR: Unrecognized action id - " + idValue);
 		}
 
 		return result;
 	}
-
+	
 	// Pass doesn't make sense, all agent are moving towards the same direction 
 	// ASSUMES Ball is in Possession
 	// ASSUMES 
@@ -152,7 +155,7 @@ public class Executor extends Converter {
 	}
 	
 	// Checks if goal is located
-	private boolean is_goal_located(SendCommand sendCommand, VisualInfo info,
+	private boolean is_goal_visible(SendCommand sendCommand, VisualInfo info,
 				Memory memory) {
 			// TODO Auto-generated method stub
 			ObjectInfo goal;

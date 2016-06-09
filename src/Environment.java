@@ -2,15 +2,13 @@ import java.util.HashMap;
 
 public class Environment {
 	public Executor executor;
-	public VisualInfo visualInfo;
 	public Memory memory;
 	public SendCommand sendCommand;
 	public HashMap<Integer, Boolean> sensoryInformation;
 
-	public Environment(Executor executor, VisualInfo visualInfo, Memory memory) {
+	public Environment(Executor executor, Memory memory) {
 		super();
 		this.executor = executor;
-		this.visualInfo = visualInfo;
 		this.memory = memory;
 		sensoryInformation = new HashMap<Integer, Boolean>();
 	}
@@ -68,8 +66,7 @@ public class Environment {
 					System.out.println("ERROR: Unkown mapping provided");
 					System.exit(1);
 				}
-				boolean intermediateResult = executor.run(id, sendCommand,
-						visualInfo, memory);
+				boolean intermediateResult = executor.run(id, memory);
 				sensoryInformation.put(id, result);
 				if (id.compareTo(negatedProperty) == 0) {
 					intermediateResult = !intermediateResult;
