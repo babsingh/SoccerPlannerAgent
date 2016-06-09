@@ -1,63 +1,48 @@
 public class Executor extends Converter {
-	public SendCommand sendCommand;
+	
 	public char side = 'l';
 	public String teamName="";
-	
-	public Executor(SendCommand sendCommand, String teamName, char side) {
+	public Executor(char _side, String teamname) {		
 		super();
-		this.sendCommand = sendCommand;
-		this.teamName = teamName;
-		this.side = side;
+		side = _side;
+		teamName = teamname;
 	}
 
-	public boolean run(Integer id, Memory memory) {
+	public boolean run(Integer id, SendCommand sendCommand, VisualInfo info,
+			Memory memory) {
 
 		boolean result = false;
 		int idValue = id.intValue();
 
 		if (idValue == CODE_PASS_ACTION) {
-			result = pass(sendCommand, memory.m_info, memory);
-			Debug.print("Executing Action: " + PASS_ACTION + " Output: " + result);
+			result = pass(sendCommand, info, memory);
 		} else if (idValue == CODE_KICK_ACTION) {
-			result = kick(sendCommand, memory.m_info, memory);
-			Debug.print("Executing Action: " + KICK_ACTION + " Output: " + result);
+			result = kick(sendCommand, info, memory);
 		} else if (idValue == CODE_LOCATE_BALL_ACTION) {
-			result = locate_ball(sendCommand, memory.m_info, memory);
-			Debug.print("Executing Action: " + LOCATE_BALL_ACTION + " Output: " + result);
+			result = locate_ball(sendCommand, info, memory);
 		} else if (idValue == CODE_INTERCEPT_BALL_ACTION) {
-			result = intercept_ball(sendCommand, memory.m_info, memory);
-			Debug.print("Executing Action: " + INTERCEPT_BALL_ACTION + " Output: " + result);
+			result = intercept_ball(sendCommand, info, memory);
 		} else if (idValue == CODE_LOCATE_GOAL_ACTION) {
-			result = locate_goal(sendCommand, memory.m_info, memory);
-			Debug.print("Executing Action: " + LOCATE_GOAL_ACTION + " Output: " + result);
+			result = locate_goal(sendCommand, info, memory);
 		} else if (idValue == CODE_SCORE_GOAL_ACTION) {
-			result = score_goal(sendCommand, memory.m_info, memory);
-			Debug.print("Executing Action: " + SCORE_GOAL_ACTION + " Output: " + result);
+			result = score_goal(sendCommand, info, memory);
 		} else if (idValue == CODE_BALL_IN_POSSESSION) {
-			result = ball_in_possession(sendCommand, memory.m_info, memory);
-			Debug.print("Executing Property: " + BALL_IN_POSSESSION + " Output: " + result);
+			result = ball_in_possession(sendCommand, info, memory);
 		} else if (idValue == CODE_IS_BALL_VISIBLE) {
-			result = is_ball_visible(sendCommand, memory.m_info, memory);
-			Debug.print("Executing Property: " + IS_BALL_VISIBLE + " Output: " + result);
+			result = is_ball_visible(sendCommand, info, memory);
 		} else if (idValue == CODE_IS_BEING_BLOCKED) {
-			result = is_being_blocked(sendCommand, memory.m_info, memory);
-			Debug.print("Executing Property: " + IS_BEING_BLOCKED + " Output: " + result);
+			result = is_being_blocked(sendCommand, info, memory);
 		} else if (idValue == CODE_CAN_PASS) {
-			result = can_pass(sendCommand, memory.m_info, memory);
-			Debug.print("Executing Property: " + CAN_PASS + " Output: " + result);
-		} else if (idValue == CODE_IS_BALL_INSIDE_GOAL) {
-			result = is_goal_scored(sendCommand, memory.m_info, memory);
-			Debug.print("Executing Property: " + IS_BALL_INSIDE_GOAL + " Output: " + result);
-		} else if (idValue == CODE_IS_GOAL_VISIBLE) {
-			result = is_goal_visible(sendCommand, memory.m_info, memory);
-			Debug.print("Executing Property: " + IS_GOAL_VISIBLE + " Output: " + result);
+			result = can_pass(sendCommand, info, memory);
+		} else if (idValue == CODE_IS_GOAL_SCORED) {
+			result = is_goal_scored(sendCommand, info, memory);
 		} else {
 			System.out.println("ERROR: Unrecognized action id - " + idValue);
 		}
 
 		return result;
 	}
-	
+
 	// Pass doesn't make sense, all agent are moving towards the same direction 
 	// ASSUMES Ball is in Possession
 	// ASSUMES 
@@ -167,7 +152,7 @@ public class Executor extends Converter {
 	}
 	
 	// Checks if goal is located
-	private boolean is_goal_visible(SendCommand sendCommand, VisualInfo info,
+	private boolean is_goal_located(SendCommand sendCommand, VisualInfo info,
 				Memory memory) {
 			// TODO Auto-generated method stub
 			ObjectInfo goal;
