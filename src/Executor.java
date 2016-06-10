@@ -1,3 +1,5 @@
+import java.util.Vector;
+
 /*
  * The purpose of this class is to evaluate environment properties 
  * and execute agent actions. 
@@ -5,8 +7,8 @@
 public class Executor extends Converter {
 	public SendCommand sendCommand;
 	public char side = 'l';
-	public String teamName="";
-	
+	public String teamName = "";
+
 	public Executor(SendCommand sendCommand, String teamName, char side) {
 		super();
 		this.sendCommand = sendCommand;
@@ -14,9 +16,9 @@ public class Executor extends Converter {
 		this.side = side;
 	}
 
-	/* 
-	 * Based upon the id passed to this method, the corresponding agent action or 
-	 * environment property is executed or evaluated respectively.
+	/*
+	 * Based upon the id passed to this method, the corresponding agent action
+	 * or environment property is executed or evaluated respectively.
 	 */
 	public boolean run(Integer id, Memory memory) {
 
@@ -24,34 +26,34 @@ public class Executor extends Converter {
 		int idValue = id.intValue();
 
 		if (idValue == CODE_PASS_ACTION) {
-			result = pass(sendCommand, memory.m_info, memory);
+			result = pass(sendCommand, memory);
 			Debug.print("Executing Action: " + PASS_ACTION + " Output: " + result);
 		} else if (idValue == CODE_LOCATE_BALL_ACTION) {
-			result = locate_ball(sendCommand, memory.m_info, memory);
+			result = locate_ball(sendCommand, memory);
 			Debug.print("Executing Action: " + LOCATE_BALL_ACTION + " Output: " + result);
 		} else if (idValue == CODE_INTERCEPT_BALL_ACTION) {
-			result = intercept_ball(sendCommand, memory.m_info, memory);
+			result = intercept_ball(sendCommand, memory);
 			Debug.print("Executing Action: " + INTERCEPT_BALL_ACTION + " Output: " + result);
 		} else if (idValue == CODE_LOCATE_GOAL_ACTION) {
-			result = locate_goal(sendCommand, memory.m_info, memory);
+			result = locate_goal(sendCommand, memory);
 			Debug.print("Executing Action: " + LOCATE_GOAL_ACTION + " Output: " + result);
 		} else if (idValue == CODE_SCORE_GOAL_ACTION) {
-			result = score_goal(sendCommand, memory.m_info, memory);
+			result = score_goal(sendCommand, memory);
 			Debug.print("Executing Action: " + SCORE_GOAL_ACTION + " Output: " + result);
 		} else if (idValue == CODE_BALL_IN_POSSESSION) {
-			result = ball_in_possession(sendCommand, memory.m_info, memory);
+			result = ball_in_possession(sendCommand, memory);
 			Debug.print("Executing Property: " + BALL_IN_POSSESSION + " Output: " + result);
 		} else if (idValue == CODE_IS_BALL_VISIBLE) {
-			result = is_ball_visible(sendCommand, memory.m_info, memory);
+			result = is_ball_visible(sendCommand, memory);
 			Debug.print("Executing Property: " + IS_BALL_VISIBLE + " Output: " + result);
 		} else if (idValue == CODE_IS_BEING_BLOCKED) {
-			result = is_being_blocked(sendCommand, memory.m_info, memory);
+			result = is_being_blocked(sendCommand, memory);
 			Debug.print("Executing Property: " + IS_BEING_BLOCKED + " Output: " + result);
 		} else if (idValue == CODE_IS_BALL_INSIDE_GOAL) {
-			result = is_goal_scored(sendCommand, memory.m_info, memory);
+			result = is_ball_inside_goal(sendCommand, memory);
 			Debug.print("Executing Property: " + IS_BALL_INSIDE_GOAL + " Output: " + result);
 		} else if (idValue == CODE_IS_GOAL_VISIBLE) {
-			result = is_goal_visible(sendCommand, memory.m_info, memory);
+			result = is_goal_visible(sendCommand, memory);
 			Debug.print("Executing Property: " + IS_GOAL_VISIBLE + " Output: " + result);
 		} else {
 			System.out.println("ERROR: Unrecognized action id - " + idValue);
@@ -59,7 +61,7 @@ public class Executor extends Converter {
 
 		return result;
 	}
-	
+
 	private void sleepOneCycle() {
 		// sleep one step to ensure that we will not send
 		// two commands in one cycle.
@@ -68,24 +70,27 @@ public class Executor extends Converter {
 		} catch (Exception e) {
 		}
 	}
-	
-	// Pass doesn't make sense, all agent are moving towards the same direction 
+
+	// Pass doesn't make sense, all agent are moving towards the same direction
 	// ASSUMES Ball is in Possession
-	// ASSUMES 
-	private boolean pass(SendCommand sendCommand, VisualInfo info, Memory memory) {
-		// TODO Auto-generated method stub
+	// ASSUMES
+	private boolean pass(SendCommand sendCommand, Memory memory) {
 		int closeDistance = 10;
 		int MAX_SHOT = 100;
-		for (int c = 0; c < info.m_objects.size(); c++) {
-			ObjectInfo object = (ObjectInfo) info.m_objects.elementAt(c);
-			if (object.m_type.compareTo("player") == 0) {
-				PlayerInfo player = (PlayerInfo) object;
-				if (player.m_teamName == teamName) {
+		Vector<PlayerInfo> players = memory.getPlayers();
+		if (null != players) {
+			for (PlayerInfo player : players) {
+				if (teamName.equals(player.getTeamName())) {
 					if (player.m_distance <= closeDistance) {
-						sendCommand.kick((MAX_SHOT - (MAX_SHOT / player.m_distance)), player.m_direction);
+						sendCommand.kick((MAX_SHOT - (MAX_SHOT / player.getDistance())), player.getDirection());
+						sleepOneCycle();
+						break;
 					}
 				}
 			}
+			return true;
+		} else {
+			Debug.print("No players found to pass");
 		}
 		return false;
 	}
@@ -94,145 +99,156 @@ public class Executor extends Converter {
 	// ASSUMES Ball is Visible, although it checks.
 	// It only locates the Ball. It just Finds ball, it doesn't go for the ball.
 	// To Go for the Ball, Call intercept_ball
-	private boolean locate_ball(SendCommand sendCommand, VisualInfo info,
-			Memory memory) {
-		ObjectInfo ball = null;
+	private boolean locate_ball(SendCommand sendCommand, Memory memory) {
+		BallInfo ball = null;
+
 		while (null == ball) {
-			ball = memory.getObject("ball");
+			ball = (BallInfo) memory.getObject("ball");
+			sendCommand.turn(40);
 			memory.waitForNewInfo();
 		}
-		sleepOneCycle();
+
 		return false;
 	}
 
 	// ASSUMES We don't have the ball
-	// ASSUMES We have Located  Ball
+	// ASSUMES We have Located Ball
 	// Goes to the Ball.
-	private boolean intercept_ball(SendCommand sendCommand, VisualInfo info,
-			Memory memory) {
+	private boolean intercept_ball(SendCommand sendCommand, Memory memory) {
 		BallInfo ball = (BallInfo) memory.getObject("ball");
-		if (ball == null) {
+
+		if (null == ball) {
 			return false;
 		}
+
 		float distance = ball.getDistance();
 		float direction = ball.getDirection();
-		if (distance > 1) {
+
+		if (distance > 1.0) {
 			if (0 != direction) {
 				sendCommand.turn(direction);
 				sleepOneCycle();
 			}
-			sendCommand.dash(10 * ball.m_distance);
+			sendCommand.dash(10 * ball.getDistance());
+//			sleepOneCycle();
 		}
+
 		return false;
 	}
 
 	// ASSUMES we have side and located goal
-	private boolean locate_goal(SendCommand sendCommand, VisualInfo info,
-			Memory memory) {
-		ObjectInfo goal = null;
+	private boolean locate_goal(SendCommand sendCommand, Memory memory) {
+		GoalInfo goal = null;
+
 		while (null == goal) {
 			if (side == 'l') {
-				goal = memory.getObject("goal r");
+				goal = (GoalInfo) memory.getObject("goal r");
 			} else {
-				goal = memory.getObject("goal l");
+				goal = (GoalInfo) memory.getObject("goal l");
 			}
-			if (goal == null) {
+
+			if (null == goal) {
 				sendCommand.turn(40);
 				memory.waitForNewInfo();
-				sleepOneCycle();
 			}
 		}
+
 		return true;
 	}
 
 	// ASSUMES we located goal
-	private boolean score_goal(SendCommand sendCommand, VisualInfo info,
-			Memory memory) {
-		ObjectInfo goal;
+	private boolean score_goal(SendCommand sendCommand, Memory memory) {
+		GoalInfo goal = null;
+
 		if (side == 'l') {
-			goal = memory.getObject("goal r");
+			goal = (GoalInfo) memory.getObject("goal r");
 		} else {
-			goal = memory.getObject("goal l");
+			goal = (GoalInfo) memory.getObject("goal l");
 		}
 
-		if (goal == null) return false;
+		if (null == goal) {
+			return false;
+		}
+
 		sendCommand.kick(100, goal.m_direction);
+		sleepOneCycle();
 		return true;
 	}
 
 	// ASSUMES Ball is visible
 	// ASSUMES
-	private boolean ball_in_possession(SendCommand sendCommand,
-			VisualInfo info, Memory memory) {
-		ObjectInfo ball = memory.getObject("ball");
-		if (ball == null) {
+	private boolean ball_in_possession(SendCommand sendCommand, Memory memory) {
+		BallInfo ball = (BallInfo) memory.getObject("ball");
+
+		if (null == ball) {
 			return false;
 		}
-		if (is_ball_visible(sendCommand, info, memory)) {
-			if (ball.m_distance <= 1.0) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	// Checks if goal is located
-	private boolean is_goal_visible(SendCommand sendCommand, VisualInfo info,
-				Memory memory) {
-			ObjectInfo goal;
-			if (side == 'l') {
-				goal = memory.getObject("goal r");
-			} else {
-				goal = memory.getObject("goal l");
-			}
-			if (goal != null) {
-				return true;
-			}
-			return false;
-		}
-			
-	//Checks if we can see ball. Either Ball is Far or Near or with us.
-	// It only cares if we can see the ball
-	private boolean is_ball_visible(SendCommand sendCommand, VisualInfo info,
-			Memory memory) {
-		ObjectInfo ball = memory.getObject("ball");
-		if (ball!=null){
-		//if (ball.m_direction != 0) 
+
+		if (ball.getDistance() <= 1.0) {
 			return true;
 		}
+
 		return false;
 	}
 
-	private boolean is_being_blocked(SendCommand sendCommand, VisualInfo info,
-			Memory memory) {
+	// Checks if goal is located
+	private boolean is_goal_visible(SendCommand sendCommand, Memory memory) {
+		GoalInfo goal = null;
+
+		if (side == 'l') {
+			goal = (GoalInfo) memory.getObject("goal r");
+		} else {
+			goal = (GoalInfo) memory.getObject("goal l");
+		}
+
+		if (null != goal) {
+			return true;
+		}
+
+		return false;
+	}
+
+	// Checks if we can see ball. Either Ball is Far or Near or with us.
+	// It only cares if we can see the ball
+	private boolean is_ball_visible(SendCommand sendCommand, Memory memory) {
+		BallInfo ball = (BallInfo) memory.getObject("ball");
+
+		if (null != ball) {
+			return true;
+		}
+
+		return false;
+	}
+
+	private boolean is_being_blocked(SendCommand sendCommand, Memory memory) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	// ASSUMES we Can see Ball and Can Locate Goal
-	private boolean is_goal_scored(SendCommand sendCommand, VisualInfo info,
-			Memory memory) {
-		ObjectInfo goal;
+	private boolean is_ball_inside_goal(SendCommand sendCommand, Memory memory) {
+		GoalInfo goal = null;
+
 		if (side == 'l') {
-			goal = memory.getObject("goal r");
-		}
-		else { 
-			goal = memory.getObject("goal l");
+			goal = (GoalInfo) memory.getObject("goal r");
+		} else {
+			goal = (GoalInfo) memory.getObject("goal l");
 		}
 
-		if (goal == null) {
+		if (null == goal) {
 			return false;
 		}
-		
-		ObjectInfo ball = memory.getObject("ball");
-		if(ball == null) {
+
+		BallInfo ball = (BallInfo) memory.getObject("ball");
+
+		if (null == ball) {
 			return false;
 		}
-		
-		if(goal.m_distance == ball.m_distance) {
+
+		if ((goal.getDistance() == ball.getDistance()) && (goal.getDirection() == ball.getDirection())) {
 			return true;
 		}
-		
+
 		return false;
 	}
 }
