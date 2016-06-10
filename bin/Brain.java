@@ -138,10 +138,11 @@ class Brain extends Thread implements SensorInput {
 		// first put it somewhere on my side
 		if (Pattern.matches("^before_kick_off.*", m_playMode))
 			sendCommand.move(-Math.random() * 52.5, 34 - Math.random() * 68.0);
-
+		
+		Environment env = new Environment(executor, m_memory);
+		
 		while (!m_timeOver) {
 			/* Plan and execute action */
-			Environment env = new Environment(executor, m_memory);
 			ArrayList<Integer> nextActions = new ArrayList<Integer>();
 			ArrayList<Integer> properties = new ArrayList<Integer>();
 			
