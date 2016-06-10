@@ -150,11 +150,9 @@ class Brain extends Thread implements SensorInput {
 			
 			boolean planDeveloped = developPlan(env, properties, nextActions);
 			if (planDeveloped) {
-				Debug.print("Set of next actions choosen:");
-				for (Integer action : nextActions) {
-					Debug.print("action - " + action);
-				}
 				performActions(nextActions);
+			} else {
+				Debug.print("ERROR: bad rules in AgentActions.txt");
 			}
 
 			// sleep one step to ensure that we will not send
