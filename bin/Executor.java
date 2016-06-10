@@ -104,8 +104,10 @@ public class Executor extends Converter {
 
 		while (null == ball) {
 			ball = (BallInfo) memory.getObject("ball");
-			sendCommand.turn(40);
-			memory.waitForNewInfo();
+			if (null == ball) {
+				sendCommand.turn(40);
+				memory.waitForNewInfo();
+			}
 		}
 
 		return false;
@@ -130,7 +132,7 @@ public class Executor extends Converter {
 				sleepOneCycle();
 			}
 			sendCommand.dash(10 * ball.getDistance());
-//			sleepOneCycle();
+			sleepOneCycle();
 		}
 
 		return false;
@@ -184,7 +186,7 @@ public class Executor extends Converter {
 			return false;
 		}
 
-		if (ball.getDistance() <= 1.0) {
+		if (ball.getDistance() < 1.0) {
 			return true;
 		}
 
