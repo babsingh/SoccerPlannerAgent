@@ -1,9 +1,16 @@
 import java.util.HashMap;
 
+/* 
+ * This class stores information about the environment.
+ * The environment information is quantified in terms of 
+ * the evaluation of properties which are used in AgentActions.txt.
+ * The evaluation of properties either yields true or false.
+ */
 public class Environment {
 	public Executor executor;
 	public Memory memory;
-	public SendCommand sendCommand;
+	
+	/* Stores the value for a property */
 	public HashMap<Integer, Boolean> sensoryInformation;
 
 	public Environment(Executor executor, Memory memory) {
@@ -11,11 +18,9 @@ public class Environment {
 		this.executor = executor;
 		this.memory = memory;
 		sensoryInformation = new HashMap<Integer, Boolean>();
-		for (Integer property : executor.sensoryMapping.values()) {
-			sensoryInformation.put(property, false);
-		}
 	}
 
+	/* Stores true for a property (adds a property from the environment) */
 	public void addSensoryInfo(Integer property) {
 		if (executor.sensoryMapping.containsValue(property)) {
 			sensoryInformation.put(property, true);
@@ -32,6 +37,7 @@ public class Environment {
 		}
 	}
 
+	/* Stores false for a property (deletes properties from the environment) */
 	public void deleteSensoryInfo(Integer property) {
 		if (executor.sensoryMapping.containsValue(property)) {
 			sensoryInformation.put(property, false);
@@ -48,8 +54,8 @@ public class Environment {
 		}
 	}
 
+	/* Evaluates a property (true or false) by calling Executor.run method */
 	public boolean getSensoryInfo(Integer property) {
-		Boolean result = null;
 		Integer id = null;
 		Integer negatedProperty = null;
 		
@@ -65,18 +71,13 @@ public class Environment {
 				System.exit(1);
 			}
 		}
-		boolean intermediateResult = executor.run(id, memory);
+		boolean result = executor.run(id, memory);
 		sensoryInformation.put(id, result);
 		if ((null != negatedProperty) && (id.compareTo(negatedProperty) == 0)) {
-			intermediateResult = !intermediateResult;
+			result = !result;
 		}
-		result = intermediateResult;
 
-		boolean out = false;
-		if (null != result) {
-			out = result.booleanValue();
-		}
-		Debug.print("Property: " + property + " - " + out);
-		return out;
+		Debug.print("Property: " + property + " - " + result);
+		return result;
 	}
 }

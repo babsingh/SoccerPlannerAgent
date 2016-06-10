@@ -55,6 +55,10 @@ class Brain extends Thread implements SensorInput {
 	// Move to a place on my side on a kick_off
 	// ************************************************
 
+	/* 
+	 * This method decides whether to run Krislet's original or modified implementation 
+	 * based upon the value assigned to variable useModifiedKrislet.
+	 */
 	public void run() {
 		if (useModifiedKrislet) {
 			modifiedKrislet();
@@ -62,35 +66,48 @@ class Brain extends Thread implements SensorInput {
 			originalKrislet();
 		}
 	}
+	
+	/* Adds properties to the environment */
+	private void deletePropertiesFromEnvironment(Environment env, ArrayList<Integer> deletions) {
+		if (null != deletions) {
+			for (Integer addProperty : deletions) {
+				env.addSensoryInfo(addProperty);
+			}
+		}		
+	}
 
+	/* Deletes properties from the environment */
+	private void addPropertiesToEnvironment(Environment env, ArrayList<Integer> additions) {
+		if (null != additions) {
+			for (Integer addProperty : additions) {
+				env.addSensoryInfo(addProperty);
+			}
+		}
+	}
+
+	/* 
+	 * This method derives a set of actions to reach the specified goal.
+	 * The goal is described in the array "properties".
+	 */
 	public boolean developPlan(Environment env, ArrayList<Integer> properties, ArrayList<Integer> actionPlan) {
 		boolean result = true;
 		
 		for (Integer property : properties) {
-			Debug.print("Property - " + property);
+			Debug.print("Property check - " + property);
 			boolean propertyValid = env.getSensoryInfo(property);
 			if (!propertyValid) {
 				boolean actionExists = false;
 				for (AgentAction agentAction : agentActions) {
-					if (agentAction.checkAdditions(property) 
-							&& developPlan(env, agentAction.getPreconditions(), actionPlan)) {
-						actionPlan.add(agentAction.getID());
-						ArrayList<Integer> temp = agentAction.getAdditions();
-						if (null != temp) {
-							for (Integer addProperty : temp) {
-								env.addSensoryInfo(addProperty);
-							}
+					if (agentAction.checkAdditions(property)) {
+						if (developPlan(env, agentAction.getPreconditions(), actionPlan)) {
+							actionPlan.add(agentAction.getID());
+							addPropertiesToEnvironment(env, agentAction.getAdditions());
+							deletePropertiesFromEnvironment(env, agentAction.getDeletions());
+							actionExists = true;
+							numActions++;
+							Debug.print("Action chosen - " + agentAction.getID());
+							break;
 						}
-						temp = agentAction.getDeletions();
-						if (null != temp) {
-							for (Integer deleteProperty : temp) {
-								env.deleteSensoryInfo(deleteProperty);
-							}
-						}
-						actionExists = true;
-						numActions++;
-						Debug.print("Action found - " + agentAction.getID());
-						break;
 					}
 				}
 				if (numActions >= maxActions) {
@@ -112,12 +129,19 @@ class Brain extends Thread implements SensorInput {
 		return result;
 	}
 
+	/* Executes the actions provided in the array */
 	public void executePlan(ArrayList<Integer> actionPlan) {
 		for (Integer i : actionPlan) {
 			executor.run(i, m_memory);
 		}
 	}
 
+	/* 
+	 * This method represents the modified Krislet implementation.
+	 * This implementation uses a planner. The planner derives a
+	 * set of actions to reach the specified goal. Once the plan or
+	 * set of actions are derived, then this method executes those actions.   
+	 */
 	public void modifiedKrislet() {
 		// first put it somewhere on my side
 		if (Pattern.matches("^before_kick_off.*", m_playMode))
@@ -129,9 +153,11 @@ class Brain extends Thread implements SensorInput {
 			ArrayList<Integer> nextActions = new ArrayList<Integer>();
 			ArrayList<Integer> properties = new ArrayList<Integer>();
 			
+			/* Set the final goal */
 			properties.add(executor.CODE_IS_BALL_INSIDE_GOAL);
 			
-			if (developPlan(env, properties, nextActions)) {
+			boolean planDeveloped = developPlan(env, properties, nextActions);
+			if (planDeveloped) {
 				executePlan(nextActions);
 			}
 
@@ -145,6 +171,9 @@ class Brain extends Thread implements SensorInput {
 		sendCommand.bye();
 	}
 
+	/*
+	 * This method contains code for Krislet's original implementation.
+	 */
 	public void originalKrislet() {
 		ObjectInfo object;
 
