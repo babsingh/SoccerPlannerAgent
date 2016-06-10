@@ -1,5 +1,5 @@
 action: (pass) preconditions: (ball_in_possession ^ is_being_blocked) additions: () deletions: (ball_in_possession)
-action: (locate_ball) preconditions: () additions: (is_ball_visible) deletions: ()
+action: (locate_ball) preconditions: (!is_ball_visible) additions: (is_ball_visible) deletions: ()
 action: (intercept_ball) preconditions: (is_ball_visible) additions: (ball_in_possession) deletions: ()
 action: (locate_goal) preconditions: (!is_goal_visible) additions: (is_goal_visible) deletions: ()
 action: (score_goal) preconditions: (is_goal_visible ^ ball_in_possession) additions: (ball_inside_goal) deletions: (ball_in_possession) 
