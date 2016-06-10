@@ -18,6 +18,9 @@ public class Environment {
 		this.executor = executor;
 		this.memory = memory;
 		sensoryInformation = new HashMap<Integer, Boolean>();
+//		for (Integer id : executor.sensoryMapping.values()) {
+//			sensoryInformation.put(id, false);
+//		}
 	}
 
 	/* Stores true for a property (adds a property from the environment) */

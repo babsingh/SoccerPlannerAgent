@@ -87,20 +87,20 @@ class Brain extends Thread implements SensorInput {
 
 	/* 
 	 * This method derives a set of actions to reach the specified goal.
-	 * The goal is described in the array "properties".
+	 * The final goal is described in the array "properties".
 	 */
-	public boolean developPlan(Environment env, ArrayList<Integer> properties, ArrayList<Integer> actionPlan) {
+	public boolean developPlan(Environment env, ArrayList<Integer> properties, ArrayList<Integer> nextActions) {
 		boolean result = true;
 		
 		for (Integer property : properties) {
-			Debug.print("Property check - " + property);
 			boolean propertyValid = env.getSensoryInfo(property);
+			Debug.print("Property validation - " + property + " value - " + propertyValid);
 			if (!propertyValid) {
 				boolean actionExists = false;
 				for (AgentAction agentAction : agentActions) {
 					if (agentAction.checkAdditions(property)) {
-						if (developPlan(env, agentAction.getPreconditions(), actionPlan)) {
-							actionPlan.add(agentAction.getID());
+						if (developPlan(env, agentAction.getPreconditions(), nextActions)) {
+							nextActions.add(agentAction.getID());
 							addPropertiesToEnvironment(env, agentAction.getAdditions());
 							deletePropertiesFromEnvironment(env, agentAction.getDeletions());
 							actionExists = true;
@@ -109,14 +109,6 @@ class Brain extends Thread implements SensorInput {
 							break;
 						}
 					}
-				}
-				if (numActions >= maxActions) {
-					numActions = 0;
-					Debug.print("Set of next actions choosen:");
-					for (Integer action : actionPlan) {
-						Debug.print("action - " + action);
-					}
-					break;
 				}
 				if (!actionExists) {
 					result = false;
@@ -130,7 +122,7 @@ class Brain extends Thread implements SensorInput {
 	}
 
 	/* Executes the actions provided in the array */
-	public void executePlan(ArrayList<Integer> actionPlan) {
+	public void performActions(ArrayList<Integer> actionPlan) {
 		for (Integer i : actionPlan) {
 			executor.run(i, m_memory);
 		}
@@ -158,7 +150,11 @@ class Brain extends Thread implements SensorInput {
 			
 			boolean planDeveloped = developPlan(env, properties, nextActions);
 			if (planDeveloped) {
-				executePlan(nextActions);
+				Debug.print("Set of next actions choosen:");
+				for (Integer action : nextActions) {
+					Debug.print("action - " + action);
+				}
+				performActions(nextActions);
 			}
 
 			// sleep one step to ensure that we will not send
@@ -256,5 +252,5 @@ class Brain extends Thread implements SensorInput {
 	public Executor executor;
 	public ArrayList<AgentAction> agentActions;
 	public int numActions = 0;
-	public int maxActions = 5;
+	public int maxActions = 100;
 }
