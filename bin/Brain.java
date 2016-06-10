@@ -104,7 +104,6 @@ class Brain extends Thread implements SensorInput {
 							addPropertiesToEnvironment(env, agentAction.getAdditions());
 							deletePropertiesFromEnvironment(env, agentAction.getDeletions());
 							actionExists = true;
-							numActions++;
 							Debug.print("Action chosen - " + agentAction.getID());
 							break;
 						}
@@ -152,14 +151,8 @@ class Brain extends Thread implements SensorInput {
 			if (planDeveloped) {
 				performActions(nextActions);
 			} else {
-				Debug.print("ERROR: bad rules in AgentActions.txt");
-			}
-
-			// sleep one step to ensure that we will not send
-			// two commands in one cycle.
-			try {
-				Thread.sleep(2 * SoccerParams.simulator_step);
-			} catch (Exception e) {
+				System.out.println("ERROR: bad rules in AgentActions.txt - no plan developed");
+				System.exit(1);
 			}
 		}
 		sendCommand.bye();
@@ -249,6 +242,4 @@ class Brain extends Thread implements SensorInput {
 	private static boolean useModifiedKrislet = true;
 	public Executor executor;
 	public ArrayList<AgentAction> agentActions;
-	public int numActions = 0;
-	public int maxActions = 100;
 }
