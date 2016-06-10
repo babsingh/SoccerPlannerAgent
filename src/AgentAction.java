@@ -37,7 +37,7 @@ public class AgentAction {
 		return preconditions;
 	}
 	
-	/* Checks if the given property exists in additions array. */
+	/* Checks if the given property exists in additions ArrayList. */
 	public boolean checkAdditions(Integer property) {
 		boolean result = true;
 		
@@ -48,7 +48,7 @@ public class AgentAction {
 		return result;
 	}
 
-	/* Checks if the given property exists in deletions array. */
+	/* Checks if the given property exists in deletions ArrayList. */
 	public boolean checkDeletions(Integer property) {
 		boolean result = true;
 		
@@ -59,7 +59,7 @@ public class AgentAction {
 		return result;
 	}
 	
-	/* Checks if the given property exists in preconditions array. */
+	/* Checks if the given property exists in preconditions ArrayList. */
 	public boolean checkPreconditions(Integer property) {
 		boolean result = true;
 		
@@ -99,7 +99,7 @@ public class AgentAction {
 		return action;
 	}
 	
-	/* Prints properties in the array - for debugging purposes */
+	/* Prints properties in the ArrayList - for debugging purposes */
 	private static void printArrayList(ArrayList<Integer> properties, String type) {
 		if (null != properties) {
 			for (Integer condition : properties) {
