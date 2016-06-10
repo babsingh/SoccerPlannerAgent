@@ -26,41 +26,41 @@ class VisualInfo {
 	public String m_message;
 
 	// Split objects into specific lists
-	private Vector<?> m_ball_list;
-	private Vector<?> m_player_list;
-	private Vector<?> m_flag_list;
-	private Vector<?> m_goal_list;
-	private Vector<?> m_line_list;
+	private Vector<BallInfo> m_ball_list;
+	private Vector<PlayerInfo> m_player_list;
+	private Vector<FlagInfo> m_flag_list;
+	private Vector<GoalInfo> m_goal_list;
+	private Vector<LineInfo> m_line_list;
 
 	// Constructor for 'see' information
 	public VisualInfo(String info) {
 		info.trim();
 		m_message = info;
-		m_player_list = new Vector<Object>(22);
-		m_ball_list = new Vector<Object>(1);
-		m_goal_list = new Vector<Object>(10);
-		m_line_list = new Vector<Object>(20);
-		m_flag_list = new Vector<Object>(60);
+		m_player_list = new Vector<PlayerInfo>(22);
+		m_ball_list = new Vector<BallInfo>(1);
+		m_goal_list = new Vector<GoalInfo>(10);
+		m_line_list = new Vector<LineInfo>(20);
+		m_flag_list = new Vector<FlagInfo>(60);
 		m_objects = new Vector<ObjectInfo>(113);
 	}
 
-	public Vector<?> getBallList() {
+	public Vector<BallInfo> getBallList() {
 		return m_ball_list;
 	}
 
-	public Vector<?> getPlayerList() {
+	public Vector<PlayerInfo> getPlayerList() {
 		return m_player_list;
 	}
 
-	public Vector<?> getGoalList() {
+	public Vector<GoalInfo> getGoalList() {
 		return m_goal_list;
 	}
 
-	public Vector<?> getLineList() {
+	public Vector<LineInfo> getLineList() {
 		return m_line_list;
 	}
 
-	public Vector<?> getFlagList() {
+	public Vector<FlagInfo> getFlagList() {
 		return m_flag_list;
 	}
 
@@ -171,35 +171,49 @@ class VisualInfo {
 				objInfo = new PlayerInfo();
 				break;
 			}
-		} // Ball
-		else if (p_ball.matcher(n).matches())
+			if (null != objInfo) {
+				m_player_list.addElement((PlayerInfo) objInfo);
+			}
+		// Ball
+		} else if (p_ball.matcher(n).matches()) {
 			objInfo = new BallInfo();
+			if (null != objInfo) {
+				m_ball_list.addElement((BallInfo) objInfo);
+			}
 		// Goal
-		else if (p_goal.matcher(n).matches()) {
-			if (len == 2)
+		} else if (p_goal.matcher(n).matches()) {
+			if (len == 2) {
 				objInfo = new GoalInfo(objectName[1].charAt(0)); // if there is
 																	// side info
-			else
+			} else {
 				objInfo = new GoalInfo();
-		} // Line
-		else if (p_line.matcher(n).matches()) {
-			if (len == 2)
+			}
+			if (null != objInfo) {
+				m_goal_list.addElement((GoalInfo) objInfo);
+			}
+		// Line
+		} else if (p_line.matcher(n).matches()) {
+			if (len == 2) {
 				objInfo = new LineInfo(objectName[1].charAt(0)); // if we know
 																	// which
 																	// line it
 																	// is
-			else
+			} else {
 				objInfo = new LineInfo();
-		} // Flag
-		else if (p_flag.matcher(n).matches()) {
+			}
+			if (null != objInfo) {
+				m_line_list.addElement((LineInfo) objInfo);
+			}
+		// Flag
+		} else if (p_flag.matcher(n).matches()) {
 			char type = ' '; // p|g
 			char pos1 = ' '; // l|r|t|b|c
 			char pos2 = ' '; // t|b|l|r|c
 			int num = 0; // 0|10|20|30|40|50
 			boolean out = true;
-			if (len == 1)
+			if (len == 1) {
 				objInfo = new FlagInfo();
-			else {
+			} else {
 				if (p_type.matcher(objectName[1]).matches()) {
 					type = objectName[1].charAt(0);
 					out = false;
@@ -259,6 +273,9 @@ class VisualInfo {
 				// a
 				// particular flag (i.e. "flag c", or "flag p l t")
 				objInfo = new FlagInfo(flagType, type, pos1, pos2, num, out);
+			}
+			if (null != objInfo) {
+				m_flag_list.addElement((FlagInfo) objInfo);
 			}
 		}
 		return objInfo;
