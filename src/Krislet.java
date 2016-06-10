@@ -95,6 +95,11 @@ class Krislet implements SendCommand {
 		m_playing = true;
 	}
 
+	/* 
+	 * This function reads AgentActions.txt and parses all agent 
+	 * actions listed in them. The agent actions are stored in  
+	 * ArrayList<AgentAction> agentActions. 
+	 */
 	private void parseAgentActions() {
 		agentActions = new ArrayList<AgentAction>();
 		
@@ -219,9 +224,10 @@ class Krislet implements SendCommand {
 			throw new IOException(message);
 		}
 
+		/* Initialize the executor and parse agent actions */
 		executor = new Executor(this, m_team, m.group(1).charAt(0));
 		parseAgentActions();
-				
+		
 		// initialize player's brain
 		m_brain = new Brain(this, m_team, m.group(1).charAt(0),
 				Integer.parseInt(m.group(2)), m.group(3), executor, agentActions);
