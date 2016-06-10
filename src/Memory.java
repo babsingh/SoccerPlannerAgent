@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.Vector;
+
 //
 //	File:			Memory.java
 //	Author:		Krzysztof Langner
@@ -58,7 +61,46 @@ class Memory
 		    }
 	    }
     }
+    
+    public Vector<PlayerInfo> getPlayers() {
+    	Vector<PlayerInfo> players = m_info.getPlayerList();
+    	if (null != players) {
+    		return players;
+    	}
+    	return null;
+    }
+    
+    public Vector<GoalInfo> getGoals() {
+    	Vector<GoalInfo> goals = m_info.getGoalList();
+    	if (null != goals) {
+    		return goals;
+    	}
+    	return null;
+    }
+    
+    public Vector<BallInfo> getBall() {
+    	Vector<BallInfo> ball = m_info.getBallList();
+    	if (null != ball) {
+    		return ball;
+    	}
+    	return null;
+    }
+    
+    public Vector<FlagInfo> getFlags() {
+    	Vector<FlagInfo> flags = m_info.getFlagList();
+    	if (null != flags) {
+    		return flags;
+    	}
+    	return null;
+    }
 
+    public Vector<LineInfo> getLines() {
+    	Vector<LineInfo> lines = m_info.getLineList();
+    	if (null != lines) {
+    		return lines;
+    	}
+    	return null;
+    }
 
     //===========================================================================
     // Private members

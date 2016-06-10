@@ -123,6 +123,7 @@ class Brain extends Thread implements SensorInput {
 	/* Executes the actions provided in the array */
 	public void performActions(ArrayList<Integer> actionPlan) {
 		for (Integer i : actionPlan) {
+			Debug.print("PERFORMING ACTION - " + i);
 			executor.run(i, m_memory);
 		}
 	}
@@ -139,7 +140,7 @@ class Brain extends Thread implements SensorInput {
 			sendCommand.move(-Math.random() * 52.5, 34 - Math.random() * 68.0);
 
 		while (!m_timeOver) {
-			/* TODO - Add code for planner */
+			/* Plan and execute action */
 			Environment env = new Environment(executor, m_memory);
 			ArrayList<Integer> nextActions = new ArrayList<Integer>();
 			ArrayList<Integer> properties = new ArrayList<Integer>();
@@ -149,6 +150,7 @@ class Brain extends Thread implements SensorInput {
 			
 			boolean planDeveloped = developPlan(env, properties, nextActions);
 			if (planDeveloped) {
+				Debug.print("PLAN DEVELOPED");
 				performActions(nextActions);
 			} else {
 				System.out.println("ERROR: bad rules in AgentActions.txt - no plan developed");
