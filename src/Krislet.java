@@ -44,6 +44,7 @@ class Krislet implements SendCommand {
 	public static void main(String a[]) throws SocketException, IOException {
 		String hostName = new String("");
 		int port = 6000;
+		boolean useModifiedKrislet = true;
 		String team = new String("Krislet3");
 
 		try {
@@ -55,6 +56,24 @@ class Krislet implements SendCommand {
 					port = Integer.parseInt(a[c + 1]);
 				} else if (a[c].compareTo("-team") == 0) {
 					team = a[c + 1];
+				} else if (a[c].compareTo("-mode") == 0) {
+					String agent_type = null;
+					if (null != a[c + 1]) {
+						agent_type = a[c + 1].trim();
+					} else {
+						throw new Exception();
+					}
+					if (null != agent_type) {
+						if (agent_type.equals("modified")) {
+							useModifiedKrislet = true;
+						} else if (agent_type.equals("original")) {
+							useModifiedKrislet = false;
+						} else {
+							throw new Exception();
+						}
+					} else {
+						throw new Exception();
+					}
 				} else {
 					throw new Exception();
 				}
@@ -68,17 +87,19 @@ class Krislet implements SendCommand {
 			System.err.println("    host        host_name    localhost");
 			System.err.println("    port        port_number  6000");
 			System.err.println("    team        team_name    Kris");
+			System.err.println("    mode        agent_type   modified");
+			System.err.println("\n    agent_type = modified or original");
 			System.err.println("");
 			System.err.println("    Example:");
 			System.err
-					.println("      krislet -host www.host.com -port 6000 -team Poland");
+					.println("      krislet -host www.host.com -port 6000 -team Poland -mode original");
 			System.err.println("    or");
-			System.err.println("      krislet -host 193.117.005.223");
+			System.err.println("      krislet -host 193.117.005.223 - mode modified");
 			return;
 		}
 
 		Krislet player = new Krislet(InetAddress.getByName(hostName), port,
-				team);
+				team, useModifiedKrislet);
 
 		// enter main loop
 		player.mainLoop();
@@ -86,13 +107,14 @@ class Krislet implements SendCommand {
 
 	// ---------------------------------------------------------------------------
 	// This constructor opens socket for connection with server
-	public Krislet(InetAddress host, int port, String team)
+	public Krislet(InetAddress host, int port, String team, boolean useModifiedKrislet)
 			throws SocketException {
-		m_socket = new DatagramSocket();
-		m_host = host;
-		m_port = port;
-		m_team = team;
-		m_playing = true;
+		this.m_socket = new DatagramSocket();
+		this.m_host = host;
+		this.m_port = port;
+		this.m_team = team;
+		this.m_playing = true;
+		this.useModifiedKrislet = useModifiedKrislet;
 	}
 
 	/* 
@@ -230,7 +252,7 @@ class Krislet implements SendCommand {
 		
 		// initialize player's brain
 		m_brain = new Brain(this, m_team, m.group(1).charAt(0),
-				Integer.parseInt(m.group(2)), m.group(3), executor, agentActions);
+				Integer.parseInt(m.group(2)), m.group(3), executor, agentActions, useModifiedKrislet);
 	}
 
 	// ===========================================================================
@@ -323,6 +345,7 @@ class Krislet implements SendCommand {
 	// private Pattern coach_pattern = Pattern.compile("coach");
 	// constants
 	private static final int MSG_SIZE = 4096; // Size of socket buffer
+	public boolean useModifiedKrislet;
 	public Executor executor;
 	public ArrayList<AgentAction> agentActions;
 
