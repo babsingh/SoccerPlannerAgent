@@ -18,7 +18,7 @@ class Brain extends Thread implements SensorInput {
 	// - stores connection to krislet
 	// - starts thread for this object
 	public Brain(SendCommand krislet, String team, char side, int number,
-			String playMode, Executor executor, ArrayList<AgentAction> agentActions) {
+			String playMode, Executor executor, ArrayList<AgentAction> agentActions, boolean useModifiedKrislet) {
 		this.m_timeOver = false;
 		this.sendCommand = krislet;
 		this.m_memory = new Memory();
@@ -28,6 +28,9 @@ class Brain extends Thread implements SensorInput {
 		this.m_playMode = playMode;
 		this.executor = executor;
 		this.agentActions = agentActions;
+		this.useModifiedKrislet = useModifiedKrislet;
+		this.env = new Environment(executor, this.m_memory);
+		this.nextActions = new ArrayList<Integer>();
 		start();
 	}
 
@@ -68,7 +71,7 @@ class Brain extends Thread implements SensorInput {
 	}
 	
 	/* Adds properties to the environment */
-	private void deletePropertiesFromEnvironment(Environment env, ArrayList<Integer> deletions) {
+	private void deletePropertiesFromEnvironment(ArrayList<Integer> deletions) {
 		if (null != deletions) {
 			for (Integer addProperty : deletions) {
 				env.addSensoryInfo(addProperty);
@@ -77,7 +80,7 @@ class Brain extends Thread implements SensorInput {
 	}
 
 	/* Deletes properties from the environment */
-	private void addPropertiesToEnvironment(Environment env, ArrayList<Integer> additions) {
+	private void addPropertiesToEnvironment(ArrayList<Integer> additions) {
 		if (null != additions) {
 			for (Integer addProperty : additions) {
 				env.addSensoryInfo(addProperty);
@@ -86,23 +89,23 @@ class Brain extends Thread implements SensorInput {
 	}
 
 	/* 
-	 * This method derives a set of actions to reach the specified goal.
-	 * The final goal is described in the array "properties".
+	 * This method derives a set of actions to reach the specified list of goals.
+	 * The goals/properties to be achieved are described in the ArrayList goals.
 	 */
-	public boolean developPlan(Environment env, ArrayList<Integer> properties, ArrayList<Integer> nextActions) {
+	public boolean developIntermediatePlans(ArrayList<Integer> goals) {
 		boolean result = true;
 		
-		for (Integer property : properties) {
-			boolean propertyValid = env.getSensoryInfo(property);
-			Debug.print("Property validation - " + property + " value - " + propertyValid);
+		for (Integer goal : goals) {
+			boolean propertyValid = env.getSensoryInfo(goal, alwaysEvaluate);
+			Debug.print("Property validation - " + goal + " value - " + propertyValid);
 			if (!propertyValid) {
 				boolean actionExists = false;
 				for (AgentAction agentAction : agentActions) {
-					if (agentAction.checkAdditions(property)) {
-						if (developPlan(env, agentAction.getPreconditions(), nextActions)) {
+					if (agentAction.checkAdditions(goal)) {
+						if (developIntermediatePlans(agentAction.getPreconditions())) {
 							nextActions.add(agentAction.getID());
-							addPropertiesToEnvironment(env, agentAction.getAdditions());
-							deletePropertiesFromEnvironment(env, agentAction.getDeletions());
+							addPropertiesToEnvironment(agentAction.getAdditions());
+							deletePropertiesFromEnvironment(agentAction.getDeletions());
 							actionExists = true;
 							Debug.print("Action chosen - " + agentAction.getID());
 							break;
@@ -119,12 +122,19 @@ class Brain extends Thread implements SensorInput {
 		
 		return result;
 	}
+	
+	/* This method derives a set of actions to reach one final/ultimate goal. */
+	public boolean developCompletePlan(Integer finalGoal) {
+		ArrayList<Integer> initGoals = new ArrayList<Integer>();
+		initGoals.add(finalGoal);
+		return developIntermediatePlans(initGoals);
+	}
 
-	/* Executes the actions provided in the array */
-	public void performActions(ArrayList<Integer> actionPlan) {
-		for (Integer i : actionPlan) {
-			Debug.print("PERFORMING ACTION - " + i);
-			executor.run(i, m_memory);
+	/* Executes the actions provided in the ArrayList */
+	public void performActions() {
+		for (Integer actionID : nextActions) {
+			Debug.print("PERFORMING ACTION - " + actionID);
+			executor.run(actionID, m_memory);
 		}
 	}
 
@@ -139,24 +149,18 @@ class Brain extends Thread implements SensorInput {
 		if (Pattern.matches("^before_kick_off.*", m_playMode))
 			sendCommand.move(-Math.random() * 52.5, 34 - Math.random() * 68.0);
 		
-		Environment env = new Environment(executor, m_memory);
-		
 		while (!m_timeOver) {
-			/* Plan and execute action */
-			ArrayList<Integer> nextActions = new ArrayList<Integer>();
-			ArrayList<Integer> properties = new ArrayList<Integer>();
-			
-			/* Set the final goal */
-			properties.add(executor.CODE_IS_BALL_INSIDE_GOAL);
-			
-			boolean planDeveloped = developPlan(env, properties, nextActions);
+			/* Choose the final goal, plan and execute actions */
+			boolean planDeveloped = developCompletePlan(executor.CODE_IS_BALL_INSIDE_GOAL);
 			if (planDeveloped) {
-				Debug.print("PLAN DEVELOPED");
-				performActions(nextActions);
+				Debug.print("PLAN DEVELOPED: #actions = " + nextActions.size());
+				performActions();
+				alwaysEvaluate = false;
 			} else {
-				System.out.println("ERROR: bad rules in AgentActions.txt - no plan developed");
-				System.exit(1);
+				Debug.print("no plan developed");
+				alwaysEvaluate = true;
 			}
+			nextActions.clear();
 		}
 		sendCommand.bye();
 	}
@@ -220,6 +224,9 @@ class Brain extends Thread implements SensorInput {
 	// This function sends see information
 	public void see(VisualInfo info) {
 		m_memory.store(info);
+		if (useModifiedKrislet) {
+			env.invalidateSensoryInformation();
+		}
 	}
 
 	// ---------------------------------------------------------------------------
@@ -242,7 +249,10 @@ class Brain extends Thread implements SensorInput {
 	private char m_side;
 	volatile private boolean m_timeOver;
 	private String m_playMode;
-	private static boolean useModifiedKrislet = true;
+	private boolean useModifiedKrislet;
+	private boolean alwaysEvaluate = false;
 	public Executor executor;
 	public ArrayList<AgentAction> agentActions;
+	public Environment env;
+	public ArrayList<Integer> nextActions;
 }
