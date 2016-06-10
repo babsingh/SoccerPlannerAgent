@@ -132,7 +132,7 @@ public class Executor extends Converter {
 				sleepOneCycle();
 			}
 			sendCommand.dash(10 * ball.getDistance());
-			sleepOneCycle();
+			memory.waitForNewInfo();
 		}
 
 		return false;
