@@ -223,7 +223,19 @@ public class Executor extends Converter {
 	}
 
 	private boolean is_being_blocked(SendCommand sendCommand, Memory memory) {
-		// TODO Auto-generated method stub
+		int closeDistance = 2;
+		Vector<PlayerInfo> players = memory.getPlayers();
+		if (null != players) {
+			for (PlayerInfo player : players) {
+				if (!teamName.equals(player.getTeamName())) {
+					if (player.m_distance <= closeDistance) {
+						return true;
+					}
+				}
+			}
+		} else {
+			Debug.print("No players found to pass");
+		}
 		return false;
 	}
 
